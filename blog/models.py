@@ -13,6 +13,8 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=250)
     description = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     participants = models.ManyToManyField(User, related_name='participants', blank=True)
