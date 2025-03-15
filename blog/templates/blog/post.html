@@ -1,0 +1,38 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ blog_post.title }} - Post{% endblock %}
+
+{% block search_bar %}
+{% endblock search_bar %}
+
+{% block content %}
+    <section class="post-detail">
+        <h1>{{ blog_post.title }}</h1>
+        <p>{{ blog_post.description }}</p>
+        <p class="author">By: {{ blog_post.created_by.username }}</p>
+        <p class="date">{{ blog_post.created|date:"F j, Y" }}</p>
+        <img src="{{ blog_post.image.url }}" alt="Post Image" class="post-image" style="width: 100px; height: 100px; object-fit: cover;">
+
+        <hr>
+
+        <section class="comments">
+            <h2>Comments</h2>
+            <div class="comment-form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <textarea name="body" placeholder="Add a comment..." required></textarea>
+                    <button type="submit">Post Comment</button>
+                </form>
+            </div>
+            <div class="comment-list">
+                {% for message in post_messages %}
+                    <div class="comment-card">
+                        <p class="user"><strong>{{ message.user.username }}:</strong></p>
+                        <p>{{ message.body }}</p>
+                        <p class="date">{{ message.created|date:"F j, Y, H:i" }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+{% endblock %}

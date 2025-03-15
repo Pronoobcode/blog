@@ -1,0 +1,17 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Create a New Post - Dev Den{% endblock %}
+
+{% block search_bar %}
+{% endblock search_bar %}
+
+{% block content %}
+    <section class="post-form">
+        <h2>Create New Blog Post</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Publish Post</button>
+        </form>
+    </section>
+{% endblock %}

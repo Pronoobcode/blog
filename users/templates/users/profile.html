@@ -1,0 +1,35 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Profile - Dev Den{% endblock %}
+
+{% block content %}
+    <section class="profile">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <img src="{{ user.avatar.url }}" alt="Profile Picture" class="profile-avatar" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 4px solid #007bff;">
+            <div class="profile-info">
+                <h1>{{ user.full_name }}</h1>
+                <p>{{ user.bio }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <a href="{% url 'users:update_profile' pk=user.pk %}" class="btn">Edit Profile</a>
+            </div>
+        </div>
+
+        <div class="profile-posts">
+            <h2>{{ user.full_name }}'s Posts</h2>
+            {% if posts %}
+                <ul>
+                    {% for post in posts %}
+                        <li>
+                            <a href="{% url 'blog:post' post.id %}">{{ post.title }}</a>
+                            <p>{{ post.description|slice:":100" }}...</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No posts yet.</p>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
+

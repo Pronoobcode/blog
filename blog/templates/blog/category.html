@@ -1,0 +1,39 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Blog Categories{% endblock %}
+
+{% block content %}
+  <div class="category-container">
+    <h1>Blog Categories</h1>
+    
+    <div class="category-list">
+      {% for category in categories %}
+        <div class="category-item">
+          <h2>{{ category.name }}</h2>
+          <p>{{ category.blogpost_set.count }} Posts</p>
+          <a href="{% url 'users:user_profile' pk=request.user.id %}" class="btn btn-primary">View Posts</a>
+        </div>
+      {% empty %}
+        <p>No categories available yet. Please check back later.</p>
+      {% endfor %}
+    </div>
+
+    <div class="user-posts">
+      <h2>Your Posts</h2>
+      {% if user_posts %}
+        <div class="post-list">
+          {% for post in user_posts %}
+            <div class="post-card">
+              <h3><a href="{% url 'blog:post' post.id %}">{{ post.title }}</a></h3>
+              <p>{{ post.description|truncatewords:20 }}</p>
+              <p><small>Category: {{ post.category.name }}</small></p>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>You have not written any posts yet.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
+
