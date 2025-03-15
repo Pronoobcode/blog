@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dev Den{% endblock %}</title>
+    {% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<script src="{% static 'js/script.js' %}" defer></script>
+
+</head>
+<body>
+
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <a href="{% url 'blog:home' %}">Dev Den</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{% url 'blog:home' %}">Home</a></li>
+                    {% if request.user.is_authenticated %}
+                        
+                        <li><a href="{% url 'blog:category' %}">Categories</a></li>
+                        <li><a href="{% url 'blog:create_post' %}">Create Post</a></li>
+                        <li><a href="{% url 'users:user_profile' pk=request.user.id %}">Profile</a></li>
+                        <li><a href="{% url 'users:logout' %}">Logout</a></li>
+                        
+                    {% else %}    
+
+                        <li><a href="{% url 'users:login' %}">Login</a></li>
+                        <li><a href="{% url 'users:register' %}">Register</a></li>
+                        
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+    {% block search_bar %}
+    <section class="hero">
+        <h2>Welcome to Dev Den</h2>
+        <p>Find the post that suits you</p>
+        <form class="search-bar">
+            <input type="text" name='q' id="search-input" placeholder="Search for posts...">
+            <button type="submit" id="search-button">Search</button>
+        </form>
+      </section>
+      {% endblock search_bar %}
+      {% if messages %}
+      <div class="alert-container">
+        {% for message in messages %}
+          <div class="alert {{ message.tags }}">
+            <p>{{ message }}</p>
+            <button class="close-btn" onclick="this.parentElement.style.display='none';">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 My Blog. All Rights Reserved.</p>
+            <ul class="social-media-links">
+                <li><a href="#">Twitter</a></li>
+            </ul>
+        </div>
+    </footer>
+
+</body>
+</html>

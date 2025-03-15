@@ -1,0 +1,36 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Home - Dev Den{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <h1>Welcome to Dev Den</h1>
+        <p>Your go-to space for interesting articles and discussions.</p>
+    </section>
+
+    <section class="blog-posts">
+        <h2>Latest Posts</h2>
+        <div class="posts-container">
+            {% for post in page_obj %}
+                <div class="post-card">
+                    <img src="{{ post.image.url }}" alt="Post Image" class="post-image" style="width: 100px; height: 100px; object-fit: cover;">
+                    <h3><a href="{% url 'blog:post' pk=post.pk %}">{{ post.title }}</a></h3>
+                    <p>{{ post.description|truncatewords:20 }}</p>
+                    <p class="author">By: {{ post.created_by.username }}</p>
+                    <p class="date">{{ post.created|date:"F j, Y" }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

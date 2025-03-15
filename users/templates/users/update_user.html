@@ -1,0 +1,14 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Update Profile - Dev Den{% endblock %}
+
+{% block content %}
+    <section class="profile-update">
+        <h2>Update Your Profile</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Update Profile</button>
+        </form>
+    </section>
+{% endblock %}
