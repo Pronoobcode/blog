@@ -8,10 +8,12 @@
         <div class="profile-header">
             <img src="{{ user.avatar.url }}" alt="Profile Picture" class="profile-avatar" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 4px solid #007bff;">
             <div class="profile-info">
-                <h1>{{ user.full_name }}</h1>
+                <h1 class='username' >{{ user.username }}</h1>
                 <p>{{ user.bio }}</p>
                 <p><strong>Email:</strong> {{ user.email }}</p>
-                <a href="{% url 'users:update_profile' pk=user.pk %}" class="btn">Edit Profile</a>
+                {% if request.user == user %}
+                    <a href="{% url 'users:update_profile' pk=user.pk %}" class="btn">Edit Profile</a>
+                {% endif %}
             </div>
         </div>
 

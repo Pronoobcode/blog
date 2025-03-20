@@ -68,14 +68,14 @@ def create_post_view(request):
 
         capitalized_title = ' '.join(word.capitalize() for word in title.split())
 
-        media_file = request.FILES.get('media')
+        media_file = request.FILES.get('image')
 
         blog_post = BlogPost.objects.create(
             created_by=request.user,
             category=category.capitalize(),
             title=capitalized_title,
             description=request.POST.get('description'),
-            image=request.POST.get('image')
+            image=media_file
         )
         messages.success(request, 'Your post has been created successfully!')
         return redirect('blog:post', pk=blog_post.id)
@@ -96,12 +96,13 @@ def update_post_view(request, pk):
     if request.method == 'POST':
         category = request.POST.get('category')
         title = request.POST.get('title')
+        media_file = request.FILES.get('image')
 
         capitalized_title = ' '.join(word.capitalize() for word in title.split())
         blog_post.title = capitalized_title
         blog_post.category = category.capitalize()
         blog_post.description = request.POST.get('description')
-        blog_post.image = request.POST.get('image')
+        blog_post.image = media_file
         
         blog_post.save()
 
@@ -109,7 +110,7 @@ def update_post_view(request, pk):
         return redirect('blog:post', pk=blog_post.id)
 
     context = {'form': form, 'blog_post': blog_post}
-    return render(request, 'blog/blog_form.html', context)
+    return render(request, 'blog/post_form.html', context)
 
 
 
@@ -145,7 +146,7 @@ def delete_message(request, pk):
     return render(request, 'base/delete.html', {'obj': message})
 
 
-@login_required(login_url='login')
+@login_required(login_url='users:login')
 def update_message_view(request, pk):
     message = get_object_or_404(Message, pk=pk)
 
@@ -172,15 +173,24 @@ def update_message_view(request, pk):
 
 
 @login_required(login_url='users:login')
-def category_view(request):
+def category_view(request, category=None):
     user_messages = Message.objects.filter(user=request.user)
     user_posts = BlogPost.objects.filter(created_by=request.user)
-    categories = list(BlogPost.objects.values_list('category', flat=True).distinct()) 
+    my_list = list(BlogPost.objects.values_list('category', flat=True).distinct())
+    categories = list(dict.fromkeys(my_list))
+
+    post_counts = {cat: BlogPost.objects.filter(category__iexact=cat).count() for cat in categories}
+
+    if category:
+        selected_posts = BlogPost.objects.filter(category__iexact=category)
+    else:
+        selected_posts = BlogPost.objects.none()  
 
     context = {
         'user_messages': user_messages,
         'user_posts': user_posts,
-        'categories': categories
+        'categories': categories,
+        'selected_posts': selected_posts,
+        'post_counts': post_counts,  
     }
     return render(request, 'blog/category.html', context)
-

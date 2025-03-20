@@ -11,9 +11,15 @@
         <p>{{ blog_post.description }}</p>
         <p class="author">By: {{ blog_post.created_by.username }}</p>
         <p class="date">{{ blog_post.created|date:"F j, Y" }}</p>
-        <img src="{{ blog_post.image.url }}" alt="Post Image" class="post-image" style="width: 100px; height: 100px; object-fit: cover;">
+        <img src="{% if blog_post.image %}{{ blog_post.image.url }}{% else %}{% endif %}" alt="Post Image" class="post-image" style="width: 100px; height: 100px; object-fit: cover;">
 
         <hr>
+        {% if request.user == blog_post.created_by %}
+            <div class="post-actions">
+                <a href="{% url 'blog:update_post' blog_post.id %}" class="btn btn-primary">Edit Post</a>
+                <a href="{% url 'blog:delete_post' blog_post.id %}" style="display:inline;" class="btn btn-danger">Delete Post</a>
+            </div>
+        {% endif %}
 
         <section class="comments">
             <h2>Comments</h2>
@@ -29,7 +35,13 @@
                     <div class="comment-card">
                         <p class="user"><strong>{{ message.user.username }}:</strong></p>
                         <p>{{ message.body }}</p>
-                        <p class="date">{{ message.created|date:"F j, Y, H:i" }}</p>
+                        <p class="date"><small>{{ message.created|date:"F j, Y, H:i" }}</small></p>
+                        {% if request.user == message.user %}
+                            <form method="POST" action="{% url 'blog:delete_message' message.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>

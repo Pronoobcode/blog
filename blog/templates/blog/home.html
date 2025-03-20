@@ -13,7 +13,7 @@
         <div class="posts-container">
             {% for post in page_obj %}
                 <div class="post-card">
-                    <img src="{{ post.image.url }}" alt="Post Image" class="post-image" style="width: 100px; height: 100px; object-fit: cover;">
+                    <img src="{% if post.image %}{{ post.image.url }}{% else %}{% endif %}" alt="Post Image" class="post-image" style="width: 100px; height: 100px; object-fit: cover;">
                     <h3><a href="{% url 'blog:post' pk=post.pk %}">{{ post.title }}</a></h3>
                     <p>{{ post.description|truncatewords:20 }}</p>
                     <p class="author">By: {{ post.created_by.username }}</p>
