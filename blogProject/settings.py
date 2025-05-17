@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-cj8p)3biozmtg9yd=h9zbgki4@unw31l9=1w2xoi8^$1n$_$k@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['blog-ssrx.onrender.com']
+ALLOWED_HOSTS = ['dev-den.onrender.com']
 
 
 
@@ -136,3 +136,8 @@ MEDIA_ROOT = BASE_DIR/ 'static/media/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Authentication settings
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'blog:home'
+LOGOUT_REDIRECT_URL = 'users:login'

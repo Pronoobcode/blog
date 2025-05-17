@@ -1,24 +1,21 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Smooth scroll for anchor links
-    const anchors = document.querySelectorAll('a[href^="#"]');
-    anchors.forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
+// Comment form validation
+const commentForm = document.querySelector('.comment-form form');
+if (commentForm) {
+    commentForm.addEventListener('submit', function(e) {
+        const body = commentForm.querySelector('textarea').value.trim();
+        if (!body) {
             e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
+            alert('Please write a comment before submitting.');
+        }
     });
+}
 
-    // Comment form validation (checking if the body of comment is not empty)
-    const commentForm = document.querySelector('.comment-form form');
-    if (commentForm) {
-        commentForm.addEventListener('submit', function(e) {
-            const body = commentForm.querySelector('textarea').value.trim();
-            if (!body) {
-                alert('Please write a comment before submitting.');
-                e.preventDefault();
-            }
-        });
-    }
-});
+// Mobile menu toggle
+const menuToggle = document.querySelector('.menu-toggle');
+const mobileMenu = document.querySelector('.mobile-menu');
+
+if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', function() {
+        mobileMenu.classList.toggle('active');
+    });
+}

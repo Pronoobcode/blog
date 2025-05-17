@@ -19,5 +19,5 @@ class UserForm(ModelForm):
     def clean_avatar(self):
         avatar = self.cleaned_data.get('avatar')
         if avatar and avatar.size > 20 * 1024 * 1024: 
-            raise ValidationError('Avatar size must be less than 5MB.')
+            raise ValidationError('Avatar size must be less than 20MB.')
         return avatar
