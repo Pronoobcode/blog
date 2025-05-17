@@ -31,9 +31,8 @@ def home_view(request):
 def post_view(request, pk):
     blog_post = get_object_or_404(BlogPost, id=pk)
     post_messages = blog_post.message_set.all()
-    participants = blog_post.participants.all()
-
-    if request.method == 'POST':
+    
+    if request.method == 'POST' and request.user.is_authenticated:
         body = request.POST.get('body')
         if body:
             Message.objects.create(
@@ -42,13 +41,17 @@ def post_view(request, pk):
                 body=body
             )
             blog_post.participants.add(request.user)
-            messages.success(request, 'Your message has been posted.')
+            messages.success(request, 'Your comment has been posted.')
             return redirect('blog:post', pk=blog_post.id)
+        messages.error(request, 'Comment cannot be empty.')
+    elif request.method == 'POST' and not request.user.is_authenticated:
+        messages.error(request, 'You must be logged in to comment.')
+        return redirect('users:login')
 
     context = {
         'blog_post': blog_post,
         'post_messages': post_messages,
-        'participants': participants
+        'participants': blog_post.participants.all()
     }
     return render(request, 'blog/post.html', context)
 
@@ -94,20 +97,21 @@ def update_post_view(request, pk):
     form = BlogPostForm(instance=blog_post)
 
     if request.method == 'POST':
-        category = request.POST.get('category')
-        title = request.POST.get('title')
-        media_file = request.FILES.get('image')
-
-        capitalized_title = ' '.join(word.capitalize() for word in title.split())
-        blog_post.title = capitalized_title
-        blog_post.category = category.capitalize()
-        blog_post.description = request.POST.get('description')
-        blog_post.image = media_file
-        
-        blog_post.save()
-
-        messages.success(request, 'Your post has been updated successfully!')
-        return redirect('blog:post', pk=blog_post.id)
+        form = BlogPostForm(request.POST, request.FILES, instance=blog_post)
+        if form.is_valid():
+            blog_post = form.save(commit=False)
+            
+            # Capitalize title and category
+            blog_post.title = ' '.join(word.capitalize() for word in blog_post.title.split())
+            blog_post.category = blog_post.category.capitalize()
+            blog_post.save()
+            
+            messages.success(request, 'Your post has been updated successfully!')
+            return redirect('blog:post', pk=blog_post.id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = BlogPostForm(instance=blog_post)
 
     context = {'form': form, 'blog_post': blog_post}
     return render(request, 'blog/post_form.html', context)
@@ -133,37 +137,43 @@ def delete_post_view(request, pk):
 @login_required(login_url='users:login')
 def delete_message(request, pk):
     message = get_object_or_404(Message, id=pk)
+    post_id = message.blog_post.id 
 
     if request.user != message.user:
         messages.error(request, "You are not authorized to delete this message.")
-        return redirect('blog:home')
+        return redirect('blog:post', pk=post_id)
 
     if request.method == 'POST':
         message.delete()
-        messages.success(request, 'Your message has been deleted.')
-        return redirect('blog:home')
+        messages.success(request, 'Your comment has been deleted.')
+        return redirect('blog:post', pk=post_id)
 
-    return render(request, 'base/delete.html', {'obj': message})
+    context = {'obj': message}
+    return render(request, 'blog/delete.html', context)
 
 
 @login_required(login_url='users:login')
 def update_message_view(request, pk):
     message = get_object_or_404(Message, pk=pk)
+    post_id = message.blog_post.id
 
     if request.user != message.user:
-        messages.error(request, "You are not authorized to edit this message.")
-        return redirect('blog:home')
+        messages.error(request, "You are not authorized to edit this comment.")
+        return redirect('blog:post', pk=post_id)
 
     if request.method == 'POST':
         form = MessageForm(request.POST, instance=message)
         if form.is_valid():
-            form.save()  
-            messages.success(request, "Your message has been updated.")
-            return redirect('blog:post', pk=message.blog_post.id)  
+            if form.cleaned_data['body'].strip():  
+                form.save()
+                messages.success(request, "Your comment has been updated.")
+                return redirect('blog:post', pk=post_id)
+            else:
+                messages.error(request, "Comment cannot be empty.")
         else:
-            messages.error(request, "There was an error updating your message.")
+            messages.error(request, "There was an error updating your comment.")
     else:
-        form = MessageForm(instance=message)  
+        form = MessageForm(instance=message)
 
     context = {
         'form': form,
@@ -176,8 +186,8 @@ def update_message_view(request, pk):
 def category_view(request, category=None):
     user_messages = Message.objects.filter(user=request.user)
     user_posts = BlogPost.objects.filter(created_by=request.user)
-    my_list = list(BlogPost.objects.values_list('category', flat=True).distinct())
-    categories = list(dict.fromkeys(my_list))
+    my_categories = list(BlogPost.objects.values_list('category', flat=True).distinct())
+    categories = list(dict.fromkeys(my_categories))
 
     post_counts = {cat: BlogPost.objects.filter(category__iexact=cat).count() for cat in categories}
 

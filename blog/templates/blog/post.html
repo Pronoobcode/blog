@@ -23,27 +23,39 @@
 
         <section class="comments">
             <h2>Comments</h2>
-            <div class="comment-form">
-                <form method="POST">
-                    {% csrf_token %}
-                    <textarea name="body" placeholder="Add a comment..." required></textarea>
-                    <button type="submit">Post Comment</button>
-                </form>
-            </div>
+            {% if user.is_authenticated %}
+                <div class="comment-form">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <textarea name="body" placeholder="Add a comment..." required></textarea>
+                        <button type="submit">Post Comment</button>
+                    </form>
+                </div>
+            {% else %}
+                <p>Please <a href="{% url 'users:login' %}">login</a> to leave a comment.</p>
+            {% endif %}
+            
             <div class="comment-list">
-                {% for message in post_messages %}
-                    <div class="comment-card">
-                        <p class="user"><strong>{{ message.user.username }}:</strong></p>
-                        <p>{{ message.body }}</p>
-                        <p class="date"><small>{{ message.created|date:"F j, Y, H:i" }}</small></p>
-                        {% if request.user == message.user %}
-                            <form method="POST" action="{% url 'blog:delete_message' message.id %}" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger">Delete</button>
-                            </form>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                {% if post_messages %}
+                    {% for message in post_messages %}
+                        <div class="comment-card">
+                            <p class="user"><strong>{{ message.user.username }}:</strong></p>
+                            <p>{{ message.body }}</p>
+                            <p class="date"><small>{{ message.created|date:"F j, Y, H:i" }}</small></p>
+                            {% if request.user == message.user %}
+                                <div class="comment-actions">
+                                    <a href="{% url 'blog:update_message' message.id %}" class="btn btn-primary">Edit</a>
+                                    <form method="POST" action="{% url 'blog:delete_message' message.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No comments yet. Be the first to comment!</p>
+                {% endif %}
             </div>
         </section>
     </section>

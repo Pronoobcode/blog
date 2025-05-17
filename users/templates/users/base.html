@@ -24,7 +24,12 @@
                     <li><a href="{% url 'blog:category' %}">Categories</a></li>
                     <li><a href="{% url 'blog:create_post' %}">Create Post</a></li>
                     <li><a href="{% url 'users:user_profile' pk=request.user.id %}">Profile</a></li>
-                    <li><a href="{% url 'users:logout' %}">Logout</a></li>
+                    <li>
+                        <form method="post" action="{% url 'users:logout' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background:none;border:none;color:inherit;text-decoration:underline;cursor:pointer;">Logout</button>
+                        </form>
+                    </li>
 
                 {% else %}    
 
